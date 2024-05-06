@@ -47,7 +47,7 @@ public class Main {
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             System.out.println(line);
-            if (line.contains("ping")) {
+            if (line.contains("PING")) {
                 bufferedWriter.write("+PONG\r\n");
             }
             bufferedWriter.flush();
