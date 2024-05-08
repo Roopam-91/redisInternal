@@ -53,7 +53,7 @@ public class Main {
             if (line.contains("ECHO")) {
                 String data = line.substring(5);
                 int length = data.length();
-                bufferedWriter.write(length +"\r\n" + data + "\r\n");
+                bufferedWriter.write("$"+length +"\r\n" + data + "\r\n");
             }
             bufferedWriter.flush();
         }
