@@ -44,14 +44,14 @@ public class Main {
         OutputStream output = clientSocket.getOutputStream();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
-            System.out.println(line);
+            System.out.println("-->"+line);
             String[] parts = line.split("\r\n");
             String command = parts[2];
             if (command.equalsIgnoreCase("ECHO")) {
                 String data = parts[4];
                 int length = data.length();
                 String result = "$"+length +"\\r\\n" + data + "\\r\\n";
-                System.out.println(result);
+                System.out.println("<--"+result);
                 output.write(
                         ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
             } else {
