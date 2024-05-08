@@ -50,6 +50,11 @@ public class Main {
             if (line.contains("PING")) {
                 bufferedWriter.write("+PONG\r\n");
             }
+            if (line.contains("ECHO")) {
+                String data = line.substring(5);
+                int length = data.length();
+                bufferedWriter.write(length +"\r\n" + data + "\r\n");
+            }
             bufferedWriter.flush();
         }
     }
