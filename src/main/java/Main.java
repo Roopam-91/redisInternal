@@ -47,7 +47,7 @@ public class Main {
             System.out.println(line);
             String[] parts = line.split("\r\n");
             if (parts.length >=2 && parts[2].equalsIgnoreCase("ECHO")) {
-                String data = line.substring(5);
+                String data = parts[4];
                 output.write(
                         ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
             } else {
