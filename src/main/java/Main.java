@@ -44,19 +44,15 @@ public class Main {
         OutputStream output = clientSocket.getOutputStream();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
-            System.out.println("-->"+line);
+            System.out.println(line);
             String[] parts = line.split("\r\n");
-            String command = parts[2];
-            if (command.equalsIgnoreCase("ECHO")) {
-                String data = parts[4];
-                int length = data.length();
-                String result = "$"+length +"\\r\\n" + data + "\\r\\n";
-                System.out.println("<--"+result);
+            if (parts.length >=2 && parts[2].equalsIgnoreCase("ECHO")) {
+                String data = line.substring(5);
                 output.write(
                         ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
             } else {
                 clientSocket.getOutputStream().write(
-                        "-ERR unknown command\r\n".getBytes());
+                        "-ERR invalid request\r\n".getBytes());
             }
         }
     }
