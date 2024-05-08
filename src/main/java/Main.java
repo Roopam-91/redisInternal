@@ -54,6 +54,9 @@ public class Main {
                 System.out.println(result);
                 output.write(
                         ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
+            } else {
+                clientSocket.getOutputStream().write(
+                        "-ERR unknown command\r\n".getBytes());
             }
         }
     }
