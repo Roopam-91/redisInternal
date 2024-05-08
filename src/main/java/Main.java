@@ -46,7 +46,8 @@ public class Main {
         while ((line = bufferedReader.readLine()) != null) {
             System.out.println(line);
             if (line.toLowerCase().contains("echo")) {
-                String data = line.substring(5);
+                String[] parts = line.split("\r\n");
+                String data = parts[4];
                 int length = data.length();
                 String result = "$"+length +"\\r\\n" + data + "\\r\\n";
                 System.out.println(result);
