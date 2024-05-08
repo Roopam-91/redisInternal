@@ -47,13 +47,12 @@ public class Main {
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             System.out.println(line);
-            if (line.contains("PING")) {
-                bufferedWriter.write("+PONG\r\n");
-            }
-            if (line.contains("ECHO")) {
+            if (line.toLowerCase().contains("echo")) {
                 String data = line.substring(5);
                 int length = data.length();
-                bufferedWriter.write("$"+length +"\r\n" + data + "\r\n");
+                String result = "$"+length +"\\r\\n" + data + "\\r\\n";
+                System.out.println(result);
+                bufferedWriter.write(result);
             }
             bufferedWriter.flush();
         }
