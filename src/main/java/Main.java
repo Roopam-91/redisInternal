@@ -38,22 +38,17 @@ public class Main {
     }
 
     private static void handleRequest(Socket clientSocket) throws IOException {
-        InputStream input = clientSocket.getInputStream();
-        InputStreamReader inputStreamReader = new InputStreamReader(input);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        OutputStream output = clientSocket.getOutputStream();
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            System.out.println(line);
-            String[] parts = line.split("\r\n");
-            if (parts.length >=2 && parts[2].equalsIgnoreCase("ECHO")) {
-                String data = parts[4];
-                output.write(
-                        ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
-            } else {
-                clientSocket.getOutputStream().write(
-                        "-ERR invalid request\r\n".getBytes());
-            }
+        byte[] input = new byte[1024];
+        int bytesRead = clientSocket.getInputStream().read(input);
+        String request = new String(input, 0, bytesRead).trim();
+        String[] parts = request.split("\r\n");
+        if (parts.length >=2 && parts[2].equalsIgnoreCase("ECHO")) {
+            String data = parts[4];
+            clientSocket.getOutputStream().write(
+                    ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
+        } else {
+            clientSocket.getOutputStream().write(
+                    "-ERR invalid request\r\n".getBytes());
         }
     }
 }
