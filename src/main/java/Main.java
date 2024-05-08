@@ -42,8 +42,6 @@ public class Main {
         InputStreamReader inputStreamReader = new InputStreamReader(input);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         OutputStream output = clientSocket.getOutputStream();
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(output);
-        BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter);
         String line;
         while ((line = bufferedReader.readLine()) != null) {
             System.out.println(line);
@@ -52,9 +50,9 @@ public class Main {
                 int length = data.length();
                 String result = "$"+length +"\\r\\n" + data + "\\r\\n";
                 System.out.println(result);
-                bufferedWriter.write(result);
+                output.write(
+                        ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
             }
-            bufferedWriter.flush();
         }
     }
 }
