@@ -51,7 +51,7 @@ public class Main {
                 if (parts.length >= 2) {
                     if (parts[2].equalsIgnoreCase("SET")) {
                         String key = parts[4];
-                        String value = parts[5];
+                        String value = getValue(parts);
                         dict.put(key, value);
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
@@ -86,5 +86,16 @@ public class Main {
                 System.err.println("Error closing client socket: " + e.getMessage());
             }
         }
+    }
+
+    private static String getValue(String[] parts) {
+        int index = 5;
+        while (index < parts.length) {
+            if (!parts[index].startsWith("$")) {
+                return parts[index];
+            }
+            index++;
+        }
+        return null;
     }
 }
