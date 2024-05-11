@@ -52,15 +52,22 @@ public class Main {
                     if (parts[2].equalsIgnoreCase("SET")) {
                         String key = parts[4];
                         String value = getValue(parts);
-                        dict.put(key, value);
+                        long timeout = Long.parseLong(parts[parts.length - 1]);
+                        Data data = new Data(value, timeout);
+                        dict.put(key, data);
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
-                        String value = (String) dict.get(parts[4]);
-                        clientSocket.getOutputStream().write(
-                                ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
+                        Data data = (Data) dict.get(parts[4]);
+                        long thresold = data.insertTs + data.timeout;
+                        boolean isExpired = thresold > System.currentTimeMillis();
+                        if (!isExpired) {
+                            String value = (String) data.value;
+                            clientSocket.getOutputStream().write(
+                                    ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
+                        }
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
@@ -84,6 +91,21 @@ public class Main {
                 clientSocket.close();
             } catch (IOException e) {
                 System.err.println("Error closing client socket: " + e.getMessage());
+            }
+        }
+    }
+
+    static class Data {
+        Object value;
+        long insertTs;
+        long timeout;
+        public Data(Object value) {
+            this(value, 0);
+        }
+        public Data(Object value, long timeout) {
+            this.value = value;
+            if (timeout != 0) {
+                this.timeout = timeout;
             }
         }
     }
