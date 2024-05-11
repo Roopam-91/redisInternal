@@ -52,7 +52,7 @@ public class Main {
                     if (parts[2].equalsIgnoreCase("SET")) {
                         String key = parts[4];
                         String value = parts[6];
-                        long timeout = parts.length == 9 ? Long.parseLong(parts[8]) : 0;
+                        long timeout = parts.length == 11 ? Long.parseLong(parts[10]) : 0;
                         Data data = new Data(value, timeout);
                         dict.put(key, data);
                         String response = "OK";
