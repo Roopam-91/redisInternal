@@ -104,6 +104,7 @@ public class Main {
         }
         public Data(Object value, long timeout) {
             this.value = value;
+            this.insertTs = System.currentTimeMillis();
             if (timeout != 0) {
                 this.timeout = timeout;
             }
