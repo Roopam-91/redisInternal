@@ -53,7 +53,9 @@ public class Main {
                         String key = parts[4];
                         String value = parts[5];
                         dict.put(key, value);
-                        clientSocket.getOutputStream().write(("OK").getBytes());
+                        String response = "OK";
+                        clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
+                                .getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
                         String value = parts[5];
