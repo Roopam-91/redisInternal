@@ -58,7 +58,7 @@ public class Main {
                                 .getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
-                        String value = parts[4];
+                        String value = (String) dict.get(parts[4]);
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
                     }
