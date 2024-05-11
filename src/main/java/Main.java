@@ -1,6 +1,9 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -19,12 +22,13 @@ public class Main {
             serverSocket = new ServerSocket(port);
             // Since the tester restarts your program quite often, setting SO_REUSEADDR
             // ensures that we don't run into 'Address already in use' errors
+            Map<String, Object> data = new ConcurrentHashMap<>();
             serverSocket.setReuseAddress(true);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 executor.submit(() -> {
                     try {
-                        handleRequest(clientSocket);
+                        handleRequest(clientSocket, data);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -37,7 +41,7 @@ public class Main {
         }
     }
 
-    private static void handleRequest(Socket clientSocket) throws IOException {
+    private static void handleRequest(Socket clientSocket, Map<String, Object> dict) throws IOException {
         try {
             while (clientSocket.isConnected()) {
                 byte[] input = new byte[1024];
@@ -45,7 +49,18 @@ public class Main {
                 String request = new String(input, 0, bytesRead).trim();
                 String[] parts = request.split("\r\n");
                 if (parts.length >= 2) {
-                    if (parts[2].equalsIgnoreCase("ECHO")) {
+                    if (parts[2].equalsIgnoreCase("SET")) {
+                        String key = parts[4];
+                        String value = parts[5];
+                        dict.put(key, value);
+                        clientSocket.getOutputStream().write(("OK").getBytes());
+                    }
+                    else if (parts[2].equalsIgnoreCase("GET")) {
+                        String value = parts[5];
+                        clientSocket.getOutputStream().write(
+                                ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
+                    }
+                    else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
