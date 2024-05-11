@@ -51,8 +51,8 @@ public class Main {
                 if (parts.length >= 2) {
                     if (parts[2].equalsIgnoreCase("SET")) {
                         String key = parts[4];
-                        String value = getValue(parts);
-                        long timeout = Long.parseLong(parts[parts.length - 1]);
+                        String value = parts[6];
+                        long timeout = parts.length == 9 ? Long.parseLong(parts[8]) : 0;
                         Data data = new Data(value, timeout);
                         dict.put(key, data);
                         String response = "OK";
