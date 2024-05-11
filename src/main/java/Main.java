@@ -65,6 +65,7 @@ public class Main {
                         long thresold = data.insertTs + data.timeout;
                         boolean isExpired = thresold > System.currentTimeMillis();
                         String value = null;
+                        System.out.printf("key %s value %s timeout %d insertTs %d%n", parts[4], data.value, data.timeout, data.insertTs);
                         if (!isExpired) {
                             value = (String) data.value;
                         }
