@@ -3,6 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,11 +64,13 @@ public class Main {
                         Data data = (Data) dict.get(parts[4]);
                         long thresold = data.insertTs + data.timeout;
                         boolean isExpired = thresold > System.currentTimeMillis();
+                        String value = null;
                         if (!isExpired) {
-                            String value = (String) data.value;
-                            clientSocket.getOutputStream().write(
-                                    ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
+                            value = (String) data.value;
                         }
+                        clientSocket.getOutputStream().write(
+                                ("$" + Optional.ofNullable(value).map(String::length).orElse(0)
+                                        + "\r\n" + value + "\r\n").getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
