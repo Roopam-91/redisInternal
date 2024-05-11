@@ -63,9 +63,10 @@ public class Main {
                     else if (parts[2].equalsIgnoreCase("GET")) {
                         Data data = (Data) dict.get(parts[4]);
                         long thresold = data.insertTs + data.timeout;
-                        boolean isExpired = thresold > System.currentTimeMillis();
+                        long currentTs = System.currentTimeMillis();
+                        boolean isExpired = thresold > currentTs;
                         String value = null;
-                        System.out.printf("key %s value %s timeout %d insertTs %d%n", parts[4], data.value, data.timeout, data.insertTs);
+                        System.out.printf("key %s value %s timeout %d insertTs %d currentTime %d%n", parts[4], data.value, data.timeout, data.insertTs, currentTs);
                         if (!isExpired) {
                             value = (String) data.value;
                         }
