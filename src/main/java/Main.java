@@ -3,6 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -61,14 +62,15 @@ public class Main {
                                 .getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
-                        Data data = (Data) dict.get(parts[4]);
-                        long thresold = data.insertTs + data.timeout;
-                        long currentTs = System.currentTimeMillis();
-                        boolean isExpired = thresold > currentTs;
+                        Object rawData = dict.get(parts[4]);
                         String value = null;
-                        System.out.printf("key %s value %s timeout %d insertTs %d currentTime %d%n", parts[4], data.value, data.timeout, data.insertTs, currentTs);
-                        if (!isExpired) {
-                            value = (String) data.value;
+                        if (Objects.nonNull(rawData)) {
+                            Data data = (Data) rawData;
+                            if (data.expiry < System.currentTimeMillis()) {
+                                dict.remove(parts[4]);
+                            } else {
+                                value = (String) data.value;
+                            }
                         }
                         clientSocket.getOutputStream().write(
                                 ("$" + Optional.ofNullable(value).map(String::length).orElse(0)
@@ -102,16 +104,15 @@ public class Main {
 
     static class Data {
         Object value;
-        long insertTs;
-        long timeout;
+        long expiry;
         public Data(Object value) {
             this(value, 0);
         }
         public Data(Object value, long timeout) {
             this.value = value;
-            this.insertTs = System.currentTimeMillis();
+            long insertTs = System.currentTimeMillis();
             if (timeout != 0) {
-                this.timeout = timeout;
+                this.expiry = insertTs + timeout;
             }
         }
     }
