@@ -17,7 +17,7 @@ public class Main {
 
         //   Uncomment this block to pass the first stage
         ServerSocket serverSocket = null;
-        int port = args.length == 3 ? Integer.parseInt(args[2]) : 6379;
+        int port = args.length == 2 ? Integer.parseInt(args[1]) : 6379;
         try {
             // Wait for connection from client.
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
