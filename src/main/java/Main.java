@@ -72,9 +72,13 @@ public class Main {
                                 value = (String) data.value;
                             }
                         }
-                        clientSocket.getOutputStream().write(
-                                ("$" + Optional.ofNullable(value).map(String::length).orElse(0)
-                                        + "\r\n" + value + "\r\n").getBytes());
+                        if (Objects.nonNull(value)) {
+                            clientSocket.getOutputStream().write(
+                                    ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
+                        } else {
+                            clientSocket.getOutputStream().write(
+                                    ("$-1\r\n").getBytes());
+                        }
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
