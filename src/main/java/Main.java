@@ -79,6 +79,13 @@ public class Main {
                             clientSocket.getOutputStream().write(
                                     ("$-1\r\n").getBytes());
                         }
+                    } else if (parts[2].equalsIgnoreCase("INFO")) {
+                        Map<String, String> infoMap = getInfoMap();
+                        StringBuilder builder = new StringBuilder();
+                        infoMap.forEach((key, value) -> builder.append(key).append(":").append(value));
+                        String value = builder.toString();
+                        clientSocket.getOutputStream().write(
+                                ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
@@ -104,6 +111,12 @@ public class Main {
                 System.err.println("Error closing client socket: " + e.getMessage());
             }
         }
+    }
+
+    private static Map<String, String> getInfoMap() {
+        Map<String, String> map = new ConcurrentHashMap<>();
+        map.put("role", "master");
+        return map;
     }
 
     static class Data {
