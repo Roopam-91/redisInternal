@@ -17,7 +17,7 @@ public class Main {
 
         //   Uncomment this block to pass the first stage
         ServerSocket serverSocket = null;
-        int port = 6379;
+        int port = args.length == 3 ? Integer.parseInt(args[2]) : 6379;
         try {
             // Wait for connection from client.
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -119,16 +119,5 @@ public class Main {
                 this.expiry = insertTs + timeout;
             }
         }
-    }
-
-    private static String getValue(String[] parts) {
-        int index = 5;
-        while (index < parts.length) {
-            if (!parts[index].startsWith("$")) {
-                return parts[index];
-            }
-            index++;
-        }
-        return null;
     }
 }
