@@ -66,7 +66,7 @@ public class Main {
                         String value = null;
                         if (Objects.nonNull(rawData)) {
                             Data data = (Data) rawData;
-                            if (data.expiry < System.currentTimeMillis()) {
+                            if (data.expiry > 0 && data.expiry < System.currentTimeMillis()) {
                                 dict.remove(parts[4]);
                             } else {
                                 value = (String) data.value;
