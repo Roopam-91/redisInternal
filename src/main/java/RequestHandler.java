@@ -50,7 +50,7 @@ public class RequestHandler {
                         }
                     }
                     else if (parts[2].equalsIgnoreCase("INFO")) {
-                        Map<String, String> infoMap = getInfoMap();
+                        Map<String, Object> infoMap = getInfoMap();
                         StringBuilder builder = new StringBuilder();
                         infoMap.forEach((key, value) -> builder.append(key).append(":").append(value));
                         String value = builder.toString();
@@ -83,10 +83,24 @@ public class RequestHandler {
         }
     }
 
-    private Map<String, String> getInfoMap() {
-        Map<String, String> map = new ConcurrentHashMap<>();
-        String role = isReplica ? "slave" : "master";
-        map.put("role", role);
+    private Map<String, Object> getInfoMap() {
+        if (isReplica) {
+            return getInfoMapSlave();
+        }
+        return getInfoMapMaster();
+    }
+
+    private Map<String, Object> getInfoMapMaster() {
+        Map<String, Object> map = new ConcurrentHashMap<>();
+        map.put("role", "master");
+        map.put("master_replid", "8371b4fb1155b71f4a04d3e1bc3e18c4a990aeeb");
+        map.put("master_repl_offset", 0);
+        return map;
+    }
+
+    private Map<String, Object> getInfoMapSlave() {
+        Map<String, Object> map = new ConcurrentHashMap<>();
+        map.put("role", "slave");
         return map;
     }
 
