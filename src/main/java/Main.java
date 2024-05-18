@@ -13,15 +13,11 @@ public class Main {
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
-            RequestHandler requestHandler = new RequestHandler(isReplica);
+            RequestHandler requestHandler = isReplica ? new ReplicaRequestHandler() : new MasterRequestHandler();
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 executor.submit(() -> {
-                    try {
-                        requestHandler.handleRequest(clientSocket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    requestHandler.handleRequest(clientSocket);
                 });
             }
         } catch (IOException e) {
