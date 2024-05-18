@@ -17,6 +17,7 @@ public class ReplicaRequestHandler implements RequestHandler {
             InputStreamReader inputStreamReader = new InputStreamReader(input);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line;
+            System.out.println("Received Response in Replica");
             while ((line = bufferedReader.readLine()) != null) {
                 System.out.println(line);
             }

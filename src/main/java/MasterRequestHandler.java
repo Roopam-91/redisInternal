@@ -50,7 +50,8 @@ public class MasterRequestHandler implements RequestHandler {
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
-                    } else if (parts[2].equalsIgnoreCase("GET")) {
+                    }
+                    else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
                         String value = null;
                         if (Objects.nonNull(rawData)) {
@@ -68,18 +69,22 @@ public class MasterRequestHandler implements RequestHandler {
                             clientSocket.getOutputStream().write(
                                     ("$-1\r\n").getBytes());
                         }
-                    } else if (parts[2].equalsIgnoreCase("INFO")) {
+                    }
+                    else if (parts[2].equalsIgnoreCase("INFO")) {
                         Map<String, Object> infoMap = getInfoMap();
                         StringBuilder builder = new StringBuilder();
                         infoMap.forEach((key, value) -> builder.append(key).append(":").append(value));
                         String value = builder.toString();
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
-                    } else if (parts[2].equalsIgnoreCase("ECHO")) {
+                    }
+                    else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
-                    } else if (parts[2].equalsIgnoreCase("PING")) {
+                    }
+                    else if (parts[2].equalsIgnoreCase("PING")) {
+                        System.out.println("Sending Pong....");
                         clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
                     } else {
                         clientSocket.getOutputStream().write(
