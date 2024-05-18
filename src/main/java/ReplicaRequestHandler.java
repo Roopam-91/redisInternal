@@ -1,9 +1,11 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,31 +19,38 @@ public class ReplicaRequestHandler implements RequestHandler {
     }
     @Override
     public void handleRequest(int port) {
+        sendPingToMaster();
+        final Socket socket;
         try {
-            Socket clientSocket = new Socket("localhost", 6379);
-            clientSocket.setReuseAddress(true);
-            // Send a message to the server
-            clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
-            clientSocket.getOutputStream().flush();
-            final Socket socket;
-            try {
-                ServerSocket serverSocket = new ServerSocket(port);
-                serverSocket.setReuseAddress(true);
-                socket = serverSocket.accept();
-                ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-                while (true) {
-                    executor.submit(() -> {
-                        handleRequest(socket);
-                    });
-                }
-
-            } catch (IOException e) {
-                System.err.println("Error handling client: " + e.getMessage());
+            ServerSocket serverSocket = new ServerSocket(port);
+            serverSocket.setReuseAddress(true);
+            socket = serverSocket.accept();
+            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+            while (true) {
+                executor.submit(() -> {
+                    handleRequest(socket);
+                });
             }
+
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error handling client: " + e.getMessage());
         }
 
+    }
+
+    private void sendPingToMaster() {
+        CompletableFuture.runAsync(() -> {
+            Socket clientSocket = null;
+            try {
+                clientSocket = new Socket("localhost", 6379);
+                clientSocket.setReuseAddress(true);
+                // Send a message to the server
+                clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
+                clientSocket.getOutputStream().flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void handleRequest(Socket clientSocket) {
