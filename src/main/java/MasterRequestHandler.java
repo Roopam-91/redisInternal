@@ -97,14 +97,6 @@ public class MasterRequestHandler implements RequestHandler {
             }
         } catch (IOException e) {
             System.err.println("Error handling client: " + e.getMessage());
-        } finally {
-            try {
-                if (Objects.nonNull(clientSocket)) {
-                    clientSocket.close();
-                }
-            } catch (IOException e) {
-                System.err.println("Error closing client socket: " + e.getMessage());
-            }
         }
     }
 
