@@ -31,6 +31,8 @@ public class ReplicaRequestHandler implements RequestHandler {
             clientSocket.getOutputStream().flush();
             clientSocket.getOutputStream().write("*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n".getBytes(StandardCharsets.UTF_8));
             clientSocket.getOutputStream().flush();
+            clientSocket.getOutputStream().write("PSYNC ? -1".getBytes(StandardCharsets.UTF_8));
+            clientSocket.getOutputStream().flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
