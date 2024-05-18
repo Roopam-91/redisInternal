@@ -3,6 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -10,6 +11,7 @@ public class RequestProcessor {
     private final Map<String, Object> storage;
     private final int port;
     private final Map<String, Object> infoMap;
+    private final String REPL_ID = UUID.randomUUID().toString();
 
     public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap) {
         this.storage = storage;
@@ -85,6 +87,11 @@ public class RequestProcessor {
                     }
                     else if (parts[2].equalsIgnoreCase("REPLCONF")) {
                         String data = "+OK\r\n";
+                        clientSocket.getOutputStream().write(
+                                ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
+                    }
+                    else if (parts[2].equalsIgnoreCase("PSYNC")) {
+                        String data = "+FULLRESYNC " + REPL_ID + " 0";
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
                     }
