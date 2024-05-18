@@ -27,12 +27,11 @@ public class ReplicaRequestHandler implements RequestHandler {
             // Send a message to the server
             while (true) {
                 clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
-                String response = new String(clientSocket.getInputStream().readAllBytes());
                 clientSocket.getOutputStream().write(("*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n" + port + "\r\n")
                         .getBytes(StandardCharsets.UTF_8));
                 clientSocket.getOutputStream().write("*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n".getBytes(StandardCharsets.UTF_8));
                 clientSocket.getOutputStream().flush();
-                response = new String(clientSocket.getInputStream().readAllBytes());
+                String response = new String(clientSocket.getInputStream().readAllBytes());
                 System.out.println("Response " + response);
                 if (response.contains("OK")) {
                     clientSocket.getOutputStream().write("*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n".getBytes(StandardCharsets.UTF_8));
