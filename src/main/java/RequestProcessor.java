@@ -92,7 +92,7 @@ public class RequestProcessor {
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("PSYNC")) {
-                        String data = String.format("+FULLSYNC %s %d %s", REPL_ID, OFFSET, "\r\n");
+                        String data = String.format("+FULLSYNC %s %d", REPL_ID, OFFSET);
                         clientSocket.getOutputStream().write(data.getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
