@@ -31,13 +31,13 @@ public class ReplicaRequestHandler implements RequestHandler {
                     .getBytes(StandardCharsets.UTF_8));
             clientSocket.getOutputStream().write("*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n".getBytes(StandardCharsets.UTF_8));
             clientSocket.getOutputStream().flush();
-            String response = new String(clientSocket.getInputStream().readAllBytes());
-            System.out.println("Response " + response);
-            if (response.contains("OK")) {
-                clientSocket.getOutputStream().write("*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n".getBytes(StandardCharsets.UTF_8));
-                clientSocket.getOutputStream().flush();
-                //break;
-            }
+//            String response = new String(clientSocket.getInputStream().readAllBytes());
+//            System.out.println("Response " + response);
+//            if (response.contains("OK")) {
+//                clientSocket.getOutputStream().write("*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n".getBytes(StandardCharsets.UTF_8));
+//                clientSocket.getOutputStream().flush();
+//                //break;
+//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
