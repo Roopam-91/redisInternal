@@ -10,6 +10,7 @@ public class ReplicaRequestHandler implements RequestHandler {
         PrintWriter out = null;
         try {
             Socket socket = new Socket("localhost", 6379);
+            socket.setReuseAddress(true);
             // Send a message to the server
             socket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
