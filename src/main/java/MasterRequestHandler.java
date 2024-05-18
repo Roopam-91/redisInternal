@@ -16,15 +16,18 @@ public class MasterRequestHandler implements RequestHandler {
 
     @Override
     public void handleRequest(int port) {
-        final Socket clientSocket;
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
-            clientSocket = serverSocket.accept();
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             while (true) {
                 executor.submit(() -> {
-                    handleRequest(clientSocket);
+                    try {
+                        Socket clientSocket = serverSocket.accept();
+                        handleRequest(clientSocket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 });
             }
 
