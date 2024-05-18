@@ -87,7 +87,7 @@ public class RequestProcessor {
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("REPLCONF")) {
-                        String data = "+OK\r\n";
+                        String data = "OK";
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
                     }
