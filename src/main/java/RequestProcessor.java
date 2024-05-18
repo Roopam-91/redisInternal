@@ -12,6 +12,7 @@ public class RequestProcessor {
     private final int port;
     private final Map<String, Object> infoMap;
     private final String REPL_ID = UUID.randomUUID().toString();
+    private final int OFFSET = 0;
 
     public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap) {
         this.storage = storage;
@@ -91,9 +92,8 @@ public class RequestProcessor {
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("PSYNC")) {
-                        String data = "+FULLRESYNC " + REPL_ID + " 0";
-                        clientSocket.getOutputStream().write(
-                                ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
+                        String data = String.format("FULLSYNC %s %d", REPL_ID, OFFSET);
+                        clientSocket.getOutputStream().write(data.getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
