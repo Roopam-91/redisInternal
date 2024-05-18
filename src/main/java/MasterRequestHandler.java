@@ -18,7 +18,6 @@ public class MasterRequestHandler implements RequestHandler {
     public void handleRequest(int port) {
         final Socket clientSocket;
         try {
-            System.out.println("In master");
             ServerSocket serverSocket = new ServerSocket(port);
             serverSocket.setReuseAddress(true);
             clientSocket = serverSocket.accept();
