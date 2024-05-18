@@ -9,7 +9,7 @@ public class ReplicaRequestHandler implements RequestHandler {
     public void handleRequest(int port) {
         PrintWriter out = null;
         try {
-            Socket socket = new Socket("localhost", 6379);
+            Socket socket = new Socket("localhost", port);
             socket.setReuseAddress(true);
             // Send a message to the server
             socket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
