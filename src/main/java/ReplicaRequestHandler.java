@@ -25,7 +25,7 @@ public class ReplicaRequestHandler implements RequestHandler {
             clientSocket = new Socket("localhost", 6379);
             clientSocket.setReuseAddress(true);
             // Send a message to the server
-            //while (true) {
+            while (true) {
                 clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
                 clientSocket.getOutputStream().flush();
 //                InputStreamReader inputStreamReader = new InputStreamReader(clientSocket.getInputStream());
@@ -53,9 +53,9 @@ public class ReplicaRequestHandler implements RequestHandler {
                     int bytesRead4 = clientSocket.getInputStream().read(buffer4);
                     String response4 = new String(buffer4, 0, bytesRead4, StandardCharsets.UTF_8);
                     System.out.println("Response1 " + response4);
-                    //break;
+                    break;
                 }
-            //}
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
