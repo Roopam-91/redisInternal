@@ -35,8 +35,10 @@ public class MasterRequestHandler implements RequestHandler {
 
     private void handleRequest(Socket clientSocket) {
         try {
+            System.out.println("Executing master...." );
             while (clientSocket.isConnected()) {
                 byte[] input = new byte[1024];
+                System.out.println("Inside clientSocket....");
                 int bytesRead = clientSocket.getInputStream().read(input);
                 String request = new String(input, 0, bytesRead).trim();
                 System.out.println("Received request...." + request);
