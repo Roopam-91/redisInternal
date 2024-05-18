@@ -17,28 +17,6 @@ public class RequestProcessor {
         this.infoMap = infoMap;
     }
 
-    public void process() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(port);
-            serverSocket.setReuseAddress(true);
-            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-            while (true) {
-                executor.submit(() -> {
-                    try {
-                        Socket clientSocket = serverSocket.accept();
-                        handleRequest(clientSocket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
-
-        } catch (IOException e) {
-            System.err.println("Error handling client: " + e.getMessage());
-        }
-
-    }
-
     public void handleRequest() {
         try {
             ServerSocket serverSocket = new ServerSocket(port);
@@ -104,6 +82,11 @@ public class RequestProcessor {
                         String value = builder.toString();
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
+                    }
+                    else if (parts[2].equalsIgnoreCase("REPLCONF")) {
+                        String data = "+OK\r\n";
+                        clientSocket.getOutputStream().write(
+                                ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
