@@ -25,7 +25,7 @@ public class ReplicaRequestHandler implements RequestHandler {
             clientSocket = new Socket("localhost", 6379);
             clientSocket.setReuseAddress(true);
             // Send a message to the server
-            while (true) {
+            //while (true) {
                 clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
                 clientSocket.getOutputStream().flush();
                 clientSocket.getOutputStream().write(("*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n" + port + "\r\n")
@@ -38,9 +38,9 @@ public class ReplicaRequestHandler implements RequestHandler {
                 if (response.contains("OK")) {
                     clientSocket.getOutputStream().write("*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n".getBytes(StandardCharsets.UTF_8));
                     clientSocket.getOutputStream().flush();
-                    break;
+                    //break;
                 }
-            }
+            //}
         } catch (IOException e) {
             e.printStackTrace();
         }
