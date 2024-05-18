@@ -11,7 +11,7 @@ public class ReplicaRequestHandler implements RequestHandler {
             Socket socket = new Socket("localhost", 6379);
             out = new PrintWriter(socket.getOutputStream(), true);
             // Send a message to the server
-            out.println("*1\r\n$4\r\nPING\r\n");
+            out.println("*1\r\n$4\r\nPING");
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
