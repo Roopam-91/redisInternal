@@ -13,12 +13,6 @@ public class ReplicaRequestHandler implements RequestHandler {
             // Send a message to the server
             out.println("*1\r\n$4\r\nPING\r\n");
             out.flush();
-            InputStream input = socket.getInputStream();
-            System.out.println("Received Response in Replica");
-            byte[] data = new byte[1024];
-            int bytesRead = input.read(data);
-            String response = new String(data, 0, bytesRead).trim();
-            System.out.println(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
