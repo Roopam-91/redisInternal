@@ -39,18 +39,16 @@ public class ReplicaRequestHandler implements RequestHandler {
     }
 
     private void sendPingToMaster() {
-        CompletableFuture.runAsync(() -> {
-            Socket clientSocket = null;
-            try {
-                clientSocket = new Socket("localhost", 6379);
-                clientSocket.setReuseAddress(true);
-                // Send a message to the server
-                clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
-                clientSocket.getOutputStream().flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+        Socket clientSocket;
+        try {
+            clientSocket = new Socket("localhost", 6379);
+            clientSocket.setReuseAddress(true);
+            // Send a message to the server
+            clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
+            clientSocket.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void handleRequest(Socket clientSocket) {
