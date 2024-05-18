@@ -14,13 +14,11 @@ public class ReplicaRequestHandler implements RequestHandler {
             out.println("*1\r\n$4\r\nPING\r\n");
             out.flush();
             InputStream input = socket.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(input);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String line;
             System.out.println("Received Response in Replica");
-            while ((line = bufferedReader.readLine()) != null) {
-                System.out.println(line);
-            }
+            byte[] data = new byte[1024];
+            int bytesRead = input.read(data);
+            String response = new String(data, 0, bytesRead).trim();
+            System.out.println(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
