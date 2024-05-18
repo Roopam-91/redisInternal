@@ -1,16 +1,39 @@
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class MasterRequestHandler implements RequestHandler{
+public class MasterRequestHandler implements RequestHandler {
     private final Map<String, Object> storage;
+
     public MasterRequestHandler() {
         storage = new ConcurrentHashMap<>();
     }
+
     @Override
-    public void handleRequest(Socket clientSocket) {
+    public void handleRequest(int port) {
+        final Socket clientSocket;
+        try {
+            ServerSocket serverSocket = new ServerSocket(port);
+            serverSocket.setReuseAddress(true);
+            clientSocket = serverSocket.accept();
+            ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+            while (true) {
+                executor.submit(() -> {
+                    handleRequest(clientSocket);
+                });
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error handling client: " + e.getMessage());
+        }
+    }
+
+    private void handleRequest(Socket clientSocket) {
         try {
             while (clientSocket.isConnected()) {
                 byte[] input = new byte[1024];
@@ -27,8 +50,7 @@ public class MasterRequestHandler implements RequestHandler{
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
-                    }
-                    else if (parts[2].equalsIgnoreCase("GET")) {
+                    } else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
                         String value = null;
                         if (Objects.nonNull(rawData)) {
@@ -46,16 +68,14 @@ public class MasterRequestHandler implements RequestHandler{
                             clientSocket.getOutputStream().write(
                                     ("$-1\r\n").getBytes());
                         }
-                    }
-                    else if (parts[2].equalsIgnoreCase("INFO")) {
+                    } else if (parts[2].equalsIgnoreCase("INFO")) {
                         Map<String, Object> infoMap = getInfoMap();
                         StringBuilder builder = new StringBuilder();
                         infoMap.forEach((key, value) -> builder.append(key).append(":").append(value));
                         String value = builder.toString();
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
-                    }
-                    else if (parts[2].equalsIgnoreCase("ECHO")) {
+                    } else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
@@ -74,7 +94,9 @@ public class MasterRequestHandler implements RequestHandler{
             System.err.println("Error handling client: " + e.getMessage());
         } finally {
             try {
-                clientSocket.close();
+                if (Objects.nonNull(clientSocket)) {
+                    clientSocket.close();
+                }
             } catch (IOException e) {
                 System.err.println("Error closing client socket: " + e.getMessage());
             }

@@ -1,7 +1,6 @@
-import java.net.Socket;
 import java.util.Map;
 
 public interface RequestHandler {
-    void handleRequest(Socket socket);
+    void handleRequest(int port);
     Map<String, Object> getInfoMap();
 }

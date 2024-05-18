@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ReplicaRequestHandler implements RequestHandler {
     @Override
-    public void handleRequest(Socket serverSocket) {
+    public void handleRequest(int port) {
         PrintWriter out = null;
         try {
             Socket socket = new Socket("localhost", 6379);
