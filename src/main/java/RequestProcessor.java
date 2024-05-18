@@ -11,7 +11,7 @@ public class RequestProcessor {
     private final Map<String, Object> storage;
     private final int port;
     private final Map<String, Object> infoMap;
-    private final String REPL_ID = UUID.randomUUID().toString();
+    private final String REPL_ID = "REPL" + "_" + UUID.randomUUID().toString().substring(15);
     private final int OFFSET = 0;
 
     public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap) {
