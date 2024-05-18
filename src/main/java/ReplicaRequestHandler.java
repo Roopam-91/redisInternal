@@ -25,40 +25,33 @@ public class ReplicaRequestHandler implements RequestHandler {
             clientSocket = new Socket("localhost", 6379);
             clientSocket.setReuseAddress(true);
             // Send a message to the server
-            //while (true) {
                 clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
                 clientSocket.getOutputStream().flush();
-//                InputStreamReader inputStreamReader = new InputStreamReader(clientSocket.getInputStream());
-//                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                byte[] buffer = new byte[1024];
-                int bytesRead = clientSocket.getInputStream().read(buffer);
-                String response = new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
-                System.out.println("Response1 " + response);
+            String response = getResponse(clientSocket);
+            System.out.println(response);
                 clientSocket.getOutputStream().write(("*3\r\n$8\r\nREPLCONF\r\n$14\r\nlistening-port\r\n$4\r\n" + port + "\r\n")
                         .getBytes(StandardCharsets.UTF_8));
-                byte[] buffer2 = new byte[1024];
-                int bytesRead2 = clientSocket.getInputStream().read(buffer2);
-                String response2 = new String(buffer2, 0, bytesRead2, StandardCharsets.UTF_8);
-                System.out.println("Response1 " + response2);
+            String response2 = getResponse(clientSocket);
+            System.out.println(response2);
                 clientSocket.getOutputStream().write("*3\r\n$8\r\nREPLCONF\r\n$4\r\ncapa\r\n$6\r\npsync2\r\n".getBytes(StandardCharsets.UTF_8));
                 clientSocket.getOutputStream().flush();
-                byte[] buffer3 = new byte[1024];
-                int bytesRead3 = clientSocket.getInputStream().read(buffer3);
-                String response3 = new String(buffer3, 0, bytesRead3, StandardCharsets.UTF_8);
-                System.out.println("Response1 " + response3);
+            String response3 = getResponse(clientSocket);
+            System.out.println(response3);
                 if (response3.contains("OK")) {
                     clientSocket.getOutputStream().write("*3\r\n$5\r\nPSYNC\r\n$1\r\n?\r\n$2\r\n-1\r\n".getBytes(StandardCharsets.UTF_8));
                     clientSocket.getOutputStream().flush();
-                    byte[] buffer4 = new byte[1024];
-                    int bytesRead4 = clientSocket.getInputStream().read(buffer4);
-                    String response4 = new String(buffer4, 0, bytesRead4, StandardCharsets.UTF_8);
-                    System.out.println("Response1 " + response4);
-                    //break;
+                    String response4 = getResponse(clientSocket);
+                    System.out.println(response4);
                 }
-            //}
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getResponse(Socket clientSocket) throws IOException {
+        byte[] buffer = new byte[1024];
+        int bytesRead = clientSocket.getInputStream().read(buffer);
+        return new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);
     }
 
 
