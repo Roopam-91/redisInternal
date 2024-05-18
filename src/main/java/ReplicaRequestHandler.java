@@ -24,7 +24,6 @@ public class ReplicaRequestHandler implements RequestHandler {
         try {
             clientSocket = new Socket("localhost", 6379);
             clientSocket.setReuseAddress(true);
-
             // Send a message to the server
             clientSocket.getOutputStream().write("*1\r\n$4\r\nPING\r\n".getBytes(StandardCharsets.UTF_8));
             clientSocket.getOutputStream().flush();
