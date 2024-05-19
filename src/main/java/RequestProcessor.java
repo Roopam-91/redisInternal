@@ -94,8 +94,8 @@ public class RequestProcessor {
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
                     }
                     else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
-                        String replID = REPL_ID + UUID.randomUUID().toString().substring(25);
-                        String data = String.format("+FULLRESYNC %s %d%s", replID, OFFSET, "\r\n");
+                        //String replID = REPL_ID + UUID.randomUUID().toString().substring(25);
+                        String data = String.format("+FULLRESYNC %s %d%s", REPL_ID, OFFSET, "\r\n");
                         clientSocket.getOutputStream().write(data.getBytes());
                         clientSocket.getOutputStream().flush();
                         String fileContents = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
@@ -104,7 +104,7 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().flush();
                         clientSocket.getOutputStream().write(bytes);
                         clientSocket.getOutputStream().flush();
-                        replicaMap.put(replID , clientSocket);
+                        replicaMap.put(REPL_ID , clientSocket);
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
