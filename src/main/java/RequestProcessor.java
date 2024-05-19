@@ -95,7 +95,7 @@ public class RequestProcessor {
                         Replica replica = new Replica("localhost", replId, Integer.parseInt(parts[6]));
                         replicaMap.put(replId , replica);
                     }
-                    else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
+                    else if (parts[2].equalsIgnoreCase("PSYNC")) {
                         String data = String.format("+FULLRESYNC %s %d%s", REPL_ID, OFFSET, "\r\n");
                         clientSocket.getOutputStream().write(data.getBytes());
                         clientSocket.getOutputStream().flush();
