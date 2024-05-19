@@ -47,7 +47,8 @@ public class RequestProcessor {
             while (clientSocket.isConnected()) {
                 byte[] input = new byte[1024];
                 int bytesRead = clientSocket.getInputStream().read(input);
-                String request = new String(input, 0, bytesRead).trim();
+                String rawRequest = new String(input, 0, bytesRead);
+                String request = rawRequest.trim();
                 String[] parts = request.split("\r\n");
                 if (parts.length >= 2) {
                     if (parts[2].equalsIgnoreCase("SET")) {
@@ -59,7 +60,7 @@ public class RequestProcessor {
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
-                        CompletableFuture.runAsync(() -> sendToReplicas(new String(input, 0, bytesRead)));
+                        CompletableFuture.runAsync(() -> sendToReplicas(rawRequest));
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
