@@ -48,7 +48,7 @@ public class ReplicaRequestHandler implements RequestHandler {
         }
     }
 
-    private String getResponse(Socket clientSocket) throws IOException {
+    public static String getResponse(Socket clientSocket) throws IOException {
         byte[] buffer = new byte[1024];
         int bytesRead = clientSocket.getInputStream().read(buffer);
         return new String(buffer, 0, bytesRead, StandardCharsets.UTF_8);

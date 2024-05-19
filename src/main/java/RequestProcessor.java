@@ -1,10 +1,9 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,12 +14,14 @@ public class RequestProcessor {
     private final String REPL_ID = "REPL";
     private final int OFFSET = 0;
     private final Role role;
+    private final Map<String, Replica> replicaMap;
 
     public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap, Role role) {
         this.storage = storage;
         this.port = port;
         this.infoMap = infoMap;
         this.role = role;
+        replicaMap = new HashMap<>();
     }
 
     public void handleRequest() {
@@ -58,6 +59,7 @@ public class RequestProcessor {
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
+                        CompletableFuture.runAsync(() -> sendToReplicas(request));
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
@@ -85,10 +87,13 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
                     }
-                    else if (parts[2].equalsIgnoreCase("REPLCONF")) {
+                    else if (parts[2].equalsIgnoreCase("REPLCONF") && Role.MASTER.name().equals(role.name())) {
                         String data = "OK";
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
+                        String replId = REPL_ID + UUID.randomUUID().toString().substring(22);
+                        Replica replica = new Replica("localhost", replId, Integer.parseInt(parts[6]));
+                        replicaMap.put(replId , replica);
                     }
                     else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
                         String data = String.format("+FULLRESYNC %s %d%s", REPL_ID, OFFSET, "\r\n");
@@ -121,5 +126,19 @@ public class RequestProcessor {
         } catch (IOException e) {
             System.err.println("Error handling client: " + e.getMessage());
         }
+    }
+
+    private void sendToReplicas(String request) {
+        replicaMap.forEach((replicaId, replica) -> {
+            try {
+                Socket socket = new Socket(replica.getHostName(), replica.getPort());
+                socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
+                socket.getOutputStream().flush();
+                String response = ReplicaRequestHandler.getResponse(socket);
+                System.out.println(response);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
