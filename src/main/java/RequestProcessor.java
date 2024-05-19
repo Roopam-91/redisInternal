@@ -29,13 +29,9 @@ public class RequestProcessor {
             serverSocket.setReuseAddress(true);
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             while (true) {
+                Socket clientSocket = serverSocket.accept();
                 executor.submit(() -> {
-                    try {
-                        Socket clientSocket = serverSocket.accept();
-                        handleRequest(clientSocket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    handleRequest(clientSocket);
                 });
             }
 
