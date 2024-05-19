@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -13,11 +14,13 @@ public class RequestProcessor {
     private final Map<String, Object> infoMap;
     private final String REPL_ID = "REPL";
     private final int OFFSET = 0;
+    private final Role role;
 
-    public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap) {
+    public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap, Role role) {
         this.storage = storage;
         this.port = port;
         this.infoMap = infoMap;
+        this.role = role;
     }
 
     public void handleRequest() {
@@ -91,9 +94,14 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
                     }
-                    else if (parts[2].equalsIgnoreCase("PSYNC")) {
+                    else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
                         String data = String.format("+FULLRESYNC %s %d%s", REPL_ID, OFFSET, "\r\n");
                         clientSocket.getOutputStream().write(data.getBytes());
+                        clientSocket.getOutputStream().flush();
+                        String fileContents = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
+                        byte[] bytes = Base64.getDecoder().decode(fileContents);
+                        clientSocket.getOutputStream().write(("$" + bytes.length + "\r\n").getBytes());
+                        clientSocket.getOutputStream().flush();
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];

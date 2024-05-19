@@ -15,7 +15,7 @@ public class ReplicaRequestHandler implements RequestHandler {
     @Override
     public void handleRequest(int port) {
         sendMessageToMaster(port);
-        RequestProcessor requestProcessor = new RequestProcessor(storage, port, getInfoMap());
+        RequestProcessor requestProcessor = new RequestProcessor(storage, port, getInfoMap(), Role.REPLICA);
         requestProcessor.handleRequest();
     }
 

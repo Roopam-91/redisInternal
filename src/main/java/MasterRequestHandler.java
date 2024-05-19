@@ -10,7 +10,7 @@ public class MasterRequestHandler implements RequestHandler {
 
     @Override
     public void handleRequest(int port) {
-        RequestProcessor requestProcessor = new RequestProcessor(storage, port, getInfoMap());
+        RequestProcessor requestProcessor = new RequestProcessor(storage, port, getInfoMap(), Role.MASTER);
         requestProcessor.handleRequest();
     }
 
