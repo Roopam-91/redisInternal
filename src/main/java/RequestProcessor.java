@@ -14,7 +14,7 @@ public class RequestProcessor {
     private final String REPL_ID = "REPL";
     private final int OFFSET = 0;
     private final Role role;
-    private final Map<String, Replica> replicaMap;
+    private final Map<String, Socket> replicaMap;
 
     public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap, Role role) {
         this.storage = storage;
@@ -30,13 +30,9 @@ public class RequestProcessor {
             serverSocket.setReuseAddress(true);
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             while (true) {
+                Socket clientSocket = serverSocket.accept();
                 executor.submit(() -> {
-                    try {
-                        Socket clientSocket = serverSocket.accept();
-                        handleRequest(clientSocket);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    handleRequest(clientSocket);
                 });
             }
 
@@ -95,9 +91,6 @@ public class RequestProcessor {
                         String data = "OK";
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
-                        String replId = REPL_ID + UUID.randomUUID().toString().substring(22);
-                        Replica replica = new Replica("localhost", replId, Integer.parseInt(parts[6]));
-                        replicaMap.put(replId , replica);
                     }
                     else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
                         String data = String.format("+FULLRESYNC %s %d%s", REPL_ID, OFFSET, "\r\n");
@@ -109,6 +102,7 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().flush();
                         clientSocket.getOutputStream().write(bytes);
                         clientSocket.getOutputStream().flush();
+                        replicaMap.put(REPL_ID , clientSocket);
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
@@ -133,9 +127,8 @@ public class RequestProcessor {
     }
 
     private void sendToReplicas(String request) {
-        replicaMap.forEach((replicaId, replica) -> {
+        replicaMap.forEach((replicaId, socket) -> {
             try {
-                Socket socket = new Socket(replica.getHostName(), replica.getPort());
                 socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
                 socket.getOutputStream().flush();
                 String response = ReplicaRequestHandler.getResponse(socket);
