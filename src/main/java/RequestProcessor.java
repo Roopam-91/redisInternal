@@ -30,9 +30,13 @@ public class RequestProcessor {
             serverSocket.setReuseAddress(true);
             ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
             while (true) {
-                Socket clientSocket = serverSocket.accept();
                 executor.submit(() -> {
-                    handleRequest(clientSocket);
+                    try {
+                        Socket clientSocket = serverSocket.accept();
+                        handleRequest(clientSocket);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 });
             }
 
@@ -87,7 +91,7 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
                     }
-                    else if (parts[2].equalsIgnoreCase("REPLCONF")) {
+                    else if (parts[2].equalsIgnoreCase("REPLCONF") && Role.MASTER.name().equals(role.name())) {
                         String data = "OK";
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
@@ -95,7 +99,7 @@ public class RequestProcessor {
                         Replica replica = new Replica("localhost", replId, Integer.parseInt(parts[6]));
                         replicaMap.put(replId , replica);
                     }
-                    else if (parts[2].equalsIgnoreCase("PSYNC")) {
+                    else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
                         String data = String.format("+FULLRESYNC %s %d%s", REPL_ID, OFFSET, "\r\n");
                         clientSocket.getOutputStream().write(data.getBytes());
                         clientSocket.getOutputStream().flush();
