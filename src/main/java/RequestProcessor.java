@@ -59,7 +59,7 @@ public class RequestProcessor {
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
-                        CompletableFuture.runAsync(() -> sendToReplicas(request));
+                        //CompletableFuture.runAsync(() -> sendToReplicas(request));
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
