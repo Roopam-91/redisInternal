@@ -59,7 +59,7 @@ public class RequestProcessor {
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
-                        //CompletableFuture.runAsync(() -> sendToReplicas(request));
+                        CompletableFuture.runAsync(() -> sendToReplicas(request));
                     }
                     else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
@@ -87,7 +87,7 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
                     }
-                    else if (parts[2].equalsIgnoreCase("REPLCONF") && Role.MASTER.name().equals(role.name())) {
+                    else if (parts[2].equalsIgnoreCase("REPLCONF")) {
                         String data = "OK";
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
