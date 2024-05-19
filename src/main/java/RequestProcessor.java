@@ -100,7 +100,7 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().flush();
                         String fileContents = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
                         byte[] bytes = Base64.getDecoder().decode(fileContents);
-                        clientSocket.getOutputStream().write(("$" + bytes.length + "\r\n").getBytes());
+                        clientSocket.getOutputStream().write(("$" + bytes.length + "\r\n" + fileContents).getBytes());
                         clientSocket.getOutputStream().flush();
                     }
                     else if (parts[2].equalsIgnoreCase("ECHO")) {
