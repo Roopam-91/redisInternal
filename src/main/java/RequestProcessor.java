@@ -4,6 +4,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,7 +22,7 @@ public class RequestProcessor {
         this.port = port;
         this.infoMap = infoMap;
         this.role = role;
-        replicaMap = new HashMap<>();
+        replicaMap = new ConcurrentHashMap<>();
     }
 
     public void handleRequest() {
@@ -60,9 +61,8 @@ public class RequestProcessor {
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
-                        CompletableFuture.runAsync(() -> sendToReplicas(rawRequest));
-                    }
-                    else if (parts[2].equalsIgnoreCase("GET")) {
+                        sendToReplicas(rawRequest);
+                    } else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
                         String value = null;
                         if (Objects.nonNull(rawData)) {
@@ -80,22 +80,19 @@ public class RequestProcessor {
                             clientSocket.getOutputStream().write(
                                     ("$-1\r\n").getBytes());
                         }
-                    }
-                    else if (parts[2].equalsIgnoreCase("INFO")) {
+                    } else if (parts[2].equalsIgnoreCase("INFO")) {
                         StringBuilder builder = new StringBuilder();
                         infoMap.forEach((key, value) -> builder.append(key).append(":").append(value));
                         String value = builder.toString();
                         clientSocket.getOutputStream().write(
                                 ("$" + value.length() + "\r\n" + value + "\r\n").getBytes());
-                    }
-                    else if (parts[2].equalsIgnoreCase("REPLCONF") && Role.MASTER.name().equals(role.name())) {
+                    } else if (parts[2].equalsIgnoreCase("REPLCONF") && Role.MASTER.name().equals(role.name())) {
                         String data = "OK";
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
-                    }
-                    else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
-                        //String replID = REPL_ID + UUID.randomUUID().toString().substring(25);
-                        String data = String.format("+FULLRESYNC %s %d%s", REPL_ID, OFFSET, "\r\n");
+                    } else if (parts[2].equalsIgnoreCase("PSYNC") && Role.MASTER.name().equals(role.name())) {
+                        String replID = REPL_ID + UUID.randomUUID().toString().substring(25);
+                        String data = String.format("+FULLRESYNC %s %d%s", replID, OFFSET, "\r\n");
                         clientSocket.getOutputStream().write(data.getBytes());
                         clientSocket.getOutputStream().flush();
                         String fileContents = "UkVESVMwMDEx+glyZWRpcy12ZXIFNy4yLjD6CnJlZGlzLWJpdHPAQPoFY3RpbWXCbQi8ZfoIdXNlZC1tZW3CsMQQAPoIYW9mLWJhc2XAAP/wbjv+wP9aog==";
@@ -104,14 +101,12 @@ public class RequestProcessor {
                         clientSocket.getOutputStream().flush();
                         clientSocket.getOutputStream().write(bytes);
                         clientSocket.getOutputStream().flush();
-                        replicaMap.put(REPL_ID , clientSocket);
-                    }
-                    else if (parts[2].equalsIgnoreCase("ECHO")) {
+                        replicaMap.put(replID, clientSocket);
+                    } else if (parts[2].equalsIgnoreCase("ECHO")) {
                         String data = parts[4];
                         clientSocket.getOutputStream().write(
                                 ("$" + data.length() + "\r\n" + data + "\r\n").getBytes());
-                    }
-                    else if (parts[2].equalsIgnoreCase("PING")) {
+                    } else if (parts[2].equalsIgnoreCase("PING")) {
                         System.out.println("Sending Pong....");
                         clientSocket.getOutputStream().write("+PONG\r\n".getBytes());
                     } else {
@@ -130,14 +125,16 @@ public class RequestProcessor {
 
     private void sendToReplicas(String request) {
         replicaMap.forEach((replicaId, socket) -> {
-            try {
-                socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
-                socket.getOutputStream().flush();
-                String response = ReplicaRequestHandler.getResponse(socket);
-                System.out.println(response);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            CompletableFuture.runAsync(() -> {
+                try {
+                    socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
+                    socket.getOutputStream().flush();
+                    String response = ReplicaRequestHandler.getResponse(socket);
+                    System.out.println(response);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 }
