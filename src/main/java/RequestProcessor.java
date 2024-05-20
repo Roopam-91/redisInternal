@@ -16,6 +16,7 @@ public class RequestProcessor {
     private final int OFFSET = 0;
     private final Role role;
     private final Map<String, Socket> replicaMap;
+
     public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap, Role role) {
         this.storage = storage;
         this.port = port;
@@ -57,10 +58,10 @@ public class RequestProcessor {
                         long timeout = parts.length == 11 ? Long.parseLong(parts[10]) : 0;
                         Data data = new Data(value, timeout);
                         storage.put(key, data);
-                        String response = "OK";
-                        clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
-                                .getBytes());
                         if (Role.MASTER.name().equals(role.name())) {
+                            String response = "OK";
+                            clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
+                                    .getBytes());
                             sendToReplicas(rawRequest);
                         }
                     } else if (parts[2].equalsIgnoreCase("GET")) {
@@ -128,6 +129,7 @@ public class RequestProcessor {
         replicaMap.forEach((replicaId, socket) -> {
             CompletableFuture.runAsync(() -> {
                 try {
+                    System.out.println("Sending to replicas");
                     socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
                     socket.getOutputStream().flush();
                     String response = ReplicaRequestHandler.getResponse(socket);
