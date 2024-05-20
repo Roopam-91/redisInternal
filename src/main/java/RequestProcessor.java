@@ -132,8 +132,8 @@ public class RequestProcessor {
                     System.out.println("Sending to replicas");
                     socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
                     socket.getOutputStream().flush();
-                    String response = ReplicaRequestHandler.getResponse(socket);
-                    System.out.println(response);
+//                    String response = ReplicaRequestHandler.getResponse(socket);
+//                    System.out.println(response);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
