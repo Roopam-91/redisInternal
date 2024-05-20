@@ -16,7 +16,6 @@ public class RequestProcessor {
     private final int OFFSET = 0;
     private final Role role;
     private final Map<String, Socket> replicaMap;
-
     public RequestProcessor(Map<String, Object> storage, int port, Map<String, Object> infoMap, Role role) {
         this.storage = storage;
         this.port = port;
