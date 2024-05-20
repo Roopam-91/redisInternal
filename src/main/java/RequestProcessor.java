@@ -60,7 +60,9 @@ public class RequestProcessor {
                         String response = "OK";
                         clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                 .getBytes());
-                        sendToReplicas(rawRequest);
+                        if (Role.MASTER.equals(role)) {
+                            sendToReplicas(rawRequest);
+                        }
                     } else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
                         String value = null;
