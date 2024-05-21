@@ -51,7 +51,7 @@ public class RequestProcessor {
                 String rawRequest = new String(input, 0, bytesRead);
                 String request = rawRequest.trim();
                 String[] parts = request.split("\r\n");
-                System.out.println("request " + request + " --> " + role);
+                System.out.println("hello request " + request + " --> " + role);
                 if (parts.length >= 2) {
                     if (parts[2].equalsIgnoreCase("SET")) {
                         String key = parts[4];
