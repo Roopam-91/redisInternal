@@ -58,6 +58,9 @@ public class RequestProcessor {
                         long timeout = parts.length == 11 ? Long.parseLong(parts[10]) : 0;
                         Data data = new Data(value, timeout);
                         storage.put(key, data);
+                        if (Role.REPLICA.name().equals(role.name())) {
+                            System.out.println(role + " --> " + storage);
+                        }
                         if (Role.MASTER.name().equals(role.name())) {
                             String response = "OK";
                             clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
@@ -74,6 +77,9 @@ public class RequestProcessor {
                             } else {
                                 value = (String) data.value;
                             }
+                        }
+                        if (Role.REPLICA.name().equals(role.name())) {
+                            System.out.println(role + " --> " + storage);
                         }
                         if (Objects.nonNull(value)) {
                             clientSocket.getOutputStream().write(
