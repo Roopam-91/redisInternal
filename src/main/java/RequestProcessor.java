@@ -65,6 +65,7 @@ public class RequestProcessor {
                             String response = "OK";
                             clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                     .getBytes());
+                            clientSocket.getOutputStream().flush();
                             sendToReplicas(rawRequest);
                         }
                     } else if (parts[2].equalsIgnoreCase("GET")) {
@@ -133,17 +134,15 @@ public class RequestProcessor {
 
     private void sendToReplicas(String request) {
         replicaMap.forEach((replicaId, socket) -> {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    System.out.println("Sending to replicas");
-                    socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
-                    socket.getOutputStream().flush();
+            try {
+                System.out.println("Sending to replicas");
+                socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
+                socket.getOutputStream().flush();
 //                    String response = ReplicaRequestHandler.getResponse(socket);
 //                    System.out.println(response);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
     }
 }
