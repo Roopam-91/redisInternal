@@ -51,6 +51,7 @@ public class RequestProcessor {
                 String rawRequest = new String(input, 0, bytesRead);
                 String request = rawRequest.trim();
                 String[] parts = request.split("\r\n");
+                System.out.println("request " + request + " --> " + role);
                 if (parts.length >= 2) {
                     if (parts[2].equalsIgnoreCase("SET")) {
                         String key = parts[4];
@@ -61,7 +62,7 @@ public class RequestProcessor {
                         if (Role.REPLICA.name().equals(role.name())) {
                             System.out.println(role + " --> " + storage);
                         }
-                        System.out.println(request + " --> " + role);
+
                         if (Role.MASTER.name().equals(role.name())) {
                             String response = "OK";
                             clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
