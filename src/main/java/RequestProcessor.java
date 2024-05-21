@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -46,12 +48,15 @@ public class RequestProcessor {
     public void handleRequest(Socket clientSocket) {
         try {
             while (clientSocket.isConnected()) {
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(clientSocket.getInputStream()));
+                System.out.println("Read request -> " + reader.readLine());
                 byte[] input = new byte[1024];
                 int bytesRead = clientSocket.getInputStream().read(input);
                 String rawRequest = new String(input, 0, bytesRead);
+                System.out.println("rawRequest request -> " + rawRequest);
                 String request = rawRequest.trim();
                 String[] parts = request.split("\r\n");
-                System.out.println("hello request " + request + " --> " + role);
                 if (parts.length >= 2) {
                     if (parts[2].equalsIgnoreCase("SET")) {
                         String key = parts[4];
@@ -62,13 +67,12 @@ public class RequestProcessor {
                         if (Role.REPLICA.name().equals(role.name())) {
                             System.out.println(role + " --> " + storage);
                         }
-
-                        String response = "OK";
-                        clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
-                                .getBytes());
-                        clientSocket.getOutputStream().flush();
-                        System.out.println("Sending to replicas");
-                        sendToReplicas(rawRequest);
+                        if (Role.MASTER.name().equals(role.name())) {
+                            String response = "OK";
+                            clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
+                                    .getBytes());
+                            sendToReplicas(rawRequest);
+                        }
                     } else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
                         String value = null;
@@ -135,15 +139,17 @@ public class RequestProcessor {
 
     private void sendToReplicas(String request) {
         replicaMap.forEach((replicaId, socket) -> {
-            try {
-                System.out.println("Sending to replicas2");
-                socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
-                socket.getOutputStream().flush();
+            CompletableFuture.runAsync(() -> {
+                try {
+                    System.out.println("Sending to replicas");
+                    socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
+                    socket.getOutputStream().flush();
 //                    String response = ReplicaRequestHandler.getResponse(socket);
 //                    System.out.println(response);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 }
