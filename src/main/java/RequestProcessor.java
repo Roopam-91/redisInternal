@@ -63,14 +63,12 @@ public class RequestProcessor {
                             System.out.println(role + " --> " + storage);
                         }
 
-                        if (Role.MASTER.name().equals(role.name())) {
-                            String response = "OK";
-                            clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
-                                    .getBytes());
-                            clientSocket.getOutputStream().flush();
-                            System.out.println("Sending to replicas");
-                            sendToReplicas(rawRequest);
-                        }
+                        String response = "OK";
+                        clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
+                                .getBytes());
+                        clientSocket.getOutputStream().flush();
+                        System.out.println("Sending to replicas");
+                        sendToReplicas(rawRequest);
                     } else if (parts[2].equalsIgnoreCase("GET")) {
                         Object rawData = storage.get(parts[4]);
                         String value = null;
