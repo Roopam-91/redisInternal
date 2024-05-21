@@ -61,6 +61,7 @@ public class RequestProcessor {
                         if (Role.REPLICA.name().equals(role.name())) {
                             System.out.println(role + " --> " + storage);
                         }
+                        System.out.println(request + " --> " + role);
                         if (Role.MASTER.name().equals(role.name())) {
                             String response = "OK";
                             clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
