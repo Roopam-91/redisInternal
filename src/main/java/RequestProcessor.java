@@ -66,6 +66,7 @@ public class RequestProcessor {
                             clientSocket.getOutputStream().write(("$" + response.length() + "\r\n" + response + "\r\n")
                                     .getBytes());
                             clientSocket.getOutputStream().flush();
+                            System.out.println("Sending to replicas");
                             sendToReplicas(rawRequest);
                         }
                     } else if (parts[2].equalsIgnoreCase("GET")) {
@@ -135,7 +136,7 @@ public class RequestProcessor {
     private void sendToReplicas(String request) {
         replicaMap.forEach((replicaId, socket) -> {
             try {
-                System.out.println("Sending to replicas");
+                System.out.println("Sending to replicas2");
                 socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
                 socket.getOutputStream().flush();
 //                    String response = ReplicaRequestHandler.getResponse(socket);
