@@ -50,8 +50,10 @@ public class RequestProcessor {
             while (clientSocket.isConnected()) {
                 BufferedReader reader = new BufferedReader(
                         new InputStreamReader(clientSocket.getInputStream()));
-                String command;
-                while ((command = reader.readLine()) != null) {
+                String command = "";
+                String currLine;
+                while ((currLine = reader.readLine()) != null) {
+                    command += currLine;
                     if (command.startsWith("*")) {
                         System.out.println("command -> " +command);
                         String request = command.trim();
