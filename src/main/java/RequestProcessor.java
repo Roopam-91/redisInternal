@@ -59,7 +59,7 @@ public class RequestProcessor {
                         System.out.println(storage);
                         String request = command.trim();
                         String[] parts = request.split("\r\n");
-                        System.out.println(parts);
+                        System.out.println(Arrays.toString(parts));
                         if (parts.length >= 2) {
                             if (parts[2].equalsIgnoreCase("SET")) {
                                 String key = parts[4];
