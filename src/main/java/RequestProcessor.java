@@ -53,6 +53,7 @@ public class RequestProcessor {
                 String command;
                 while ((command = reader.readLine()) != null) {
                     if (command.startsWith("*")) {
+                        System.out.println("command -> " +command);
                         String request = command.trim();
                         String[] parts = request.split("\r\n");
                         if (parts.length >= 2) {
@@ -144,8 +145,8 @@ public class RequestProcessor {
                     System.out.println("Sending to replicas");
                     socket.getOutputStream().write(request.getBytes(StandardCharsets.UTF_8));
                     socket.getOutputStream().flush();
-//                    String response = ReplicaRequestHandler.getResponse(socket);
-//                    System.out.println(response);
+                    String response = ReplicaRequestHandler.getResponse(socket);
+                    System.out.println(response);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
