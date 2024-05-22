@@ -56,6 +56,7 @@ public class RequestProcessor {
                     command += currLine;
                     if (command.startsWith("*")) {
                         System.out.println("command -> " +command);
+                        System.out.println(storage);
                         String request = command.trim();
                         String[] parts = request.split("\r\n");
                         if (parts.length >= 2) {
